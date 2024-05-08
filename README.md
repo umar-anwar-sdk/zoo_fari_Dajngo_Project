@@ -1,12 +1,12 @@
-# Project Name
+# ZooFari Dajngo Project
 
-This project is designed for [purpose of your project].
+This project is designed for the Zoo Visiting Application.
 
 ## How to Use
 
 1. Clone the repository to your local machine.
-2. [install all requirements].
-3. [This is a Web application  ].
+2. Install all requirements.
+3. This is a Web application .
 
 ## Project Images
 
@@ -17,6 +17,4 @@ This project is designed for [purpose of your project].
 ![Contact US](path/to/your/image.jpg)
 ![Buy Ticket](path/to/another/image.png)
 
-## Additional Information
 
-[Add any other relevant information about your project here].
