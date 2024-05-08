@@ -11,7 +11,7 @@ This project is designed for the Zoo Visiting Application.
 ## Project Images
 
 
-![Home Page](path/to/your/image.jpg)
+![Home Page](admin_panal)
 ![Login](path/to/your/image.jpg)
 ![Signup](path/to/your/image.jpg)
 ![Contact US](path/to/your/image.jpg)
