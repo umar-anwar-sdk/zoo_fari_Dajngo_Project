@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body, html {
+            height: 100%;
+        }
+        .bg-image {
+            background-image: url('{% static 'img/back.jpg' %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100%;
+        }
+        .center-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        h1{
+            text-shadow: #0f5132;
+            font-weight: bolder;
+            max-font-size: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-image">
+    <div class="container center-content">
+        <div class="row">
+            <div class="col text-center">
+                <h1>Thank You</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+{% endblock %}

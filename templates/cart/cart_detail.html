@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load cart_tag %}
+{% load static %}
+{% block content %}
+      <!-- Membership Start -->
+    <div class="container-xxl py-5">
+      <div class="container">
+        <div
+          class="row g-5 mb-5 align-items-end wow fadeInUp"
+          data-wow-delay="0.1s"
+        >
+          <div class="col-lg-6">
+            <p><span class="text-primary me-2">#</span>Membership</p>
+            <h1 class="display-5 mb-0">
+              You Can Be A Proud Member Of
+              <span class="text-primary">Zoofari</span>
+            </h1>
+          </div>
+        </div>
+       <!-- Update your template -->
+<div class="row g-4">
+  {% for m in offers %}
+    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+      <div class="membership-item position-relative">
+        <img class="img-fluid" src="{{m.image.url}}" alt="" />
+        <h1 class="display-1">0{{ m.number }}</h1>
+        <h4 class="text-white mb-3">{{ m.name }}</h4>
+        <h3 class="text-primary mb-4">${{ m.payment }}.00</h3>
+        <p><i class="fa fa-check text-primary me-3"></i>{{ m.list1 }}</p>
+        <p><i class="fa fa-check text-primary me-3"></i>{{ m.list2 }}</p>
+        <p><i class="fa fa-check text-primary me-3"></i>{{ m.list3 }}</p>
+        <form method="post" action="{% url 'order' %}">
+          {% csrf_token %}
+          <input type="hidden" name="offer_id" value="{{ m.id }}">
+          <input type="email" name="user_email" placeholder="Your Email">
+          <button type="submit" class="btn btn-outline-light px-4 mt-3">Order Now</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+        </div>
+      </div>
+    </div>
+    <!-- Membership End -->
+    <!-- Form -->
+
+{% endblock %}

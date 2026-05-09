@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <!--Form-->
+    <div class="container">
+    <h1 class="display-5 mb-0">
+              Add Your Own Deals
+              <span class="text-primary">Zoofari</span>
+            </h1>
+<form class="row g-3" method="post">
+    {% csrf_token %}
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">First Name</label>
+    <input type="text" class="form-control" id="inputname" name="first">
+  </div>
+     <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Last Name</label>
+    <input type="text" class="form-control" id="inputlastname" name="last">
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Email</label>
+    <input type="email" class="form-control" id="inputemail" name="email">
+  </div>
+    <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Phone Number</label>
+    <input type="number" class="form-control" id="inputphone" placeholder="+92" name="phone">
+  </div>
+  <div class="col-12">
+    <label for="inputAddress" class="form-label">Address</label>
+    <input type="text" class="form-control" id="inputAddress" placeholder="Your Address" name="address">
+  </div>
+
+    <div class="col-md-6">
+    <label for="inputCity" class="form-label">City</label>
+    <input type="text" class="form-control" id="inputCity" name="city">
+  </div>
+  <div class="col-md-4">
+    <label for="inputState" class="form-label">State</label>
+    <select id="inputState" class="form-select" name="state">
+      <option selected>Choose...</option>
+      <option>Punjab</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label for="inputZip" class="form-label">Zip Code</label>
+    <input type="text" class="form-control" id="inputZip" name="zip">
+  </div>
+    <div class="col-md-6">
+    <label for="inputCity" class="form-label">Adult Visitor</label>
+    <input type="number" class="form-control" id="inputadult" name="adult">
+  </div>
+    <div class="col-md-6">
+    <label for="inputCity" class="form-label">Kids Visitor</label>
+    <input type="number" class="form-control" id="inputkids" name="kids">
+  </div>
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="gridCheck">
+      <label class="form-check-label" for="gridCheck">
+        I am Not a Robot
+      </label>
+    </div>
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+    </div>>
+{% endblock %}
+

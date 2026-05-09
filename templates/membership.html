@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <!-- Page Header End -->
+
+      <!-- Membership Start -->
+    <div class="container-xxl py-5">
+      <div class="container">
+        <div
+          class="row g-5 mb-5 align-items-end wow fadeInUp"
+          data-wow-delay="0.1s"
+        >
+          <div class="col-lg-6">
+            <p><span class="text-primary me-2">#</span>Membership</p>
+            <h1 class="display-5 mb-0">
+              You Can Be A Proud Member Of
+              <span class="text-primary">Zoofari</span>
+            </h1>
+          </div>
+          <div class="col-lg-6 text-lg-end">
+            <a class="btn btn-primary py-3 px-5" href="">Special Pricing</a>
+          </div>
+        </div>
+       <div class="row g-4">
+        {% for offer in offers %}
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="membership-item position-relative">
+                <img class="img-fluid" src="{{ offer.image.url }}" alt="" />
+                <h1 class="display-1">0{{ offer.number }}</h1>
+                <h4 class="text-white mb-3">{{ offer.name }}</h4>
+                <h3 class="text-primary mb-4">${{ offer.price }}.00</h3>
+                <p><i class="fa fa-check text-primary me-3"></i>{{ offer.list1 }}</p>
+                <p><i class="fa fa-check text-primary me-3"></i>{{ offer.list2 }}</p>
+                <p><i class="fa fa-check text-primary me-3"></i>{{ offer.list3 }}</p>
+                <form method="post" action="{% url 'order_membership' offer.id %}">
+                    {% csrf_token %}
+                    <input type="email" name="user_email" placeholder="Your Email">
+                    <input type="text" name="user_name" placeholder="Your Name">
+                    <button type="submit" class="btn btn-outline-light px-4 mt-3">Get Started</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+      </div>
+    </div>
+    <!-- Membership End -->
+{% endblock %}
