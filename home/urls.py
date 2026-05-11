@@ -20,8 +20,8 @@ urlpatterns = [
     path("signup/", views.signup, name='signup'),
     path('logout/', custom_logout, name='logout'),
     path("accounts/", include('django.contrib.auth.urls')),
-    
-    path('api/services/', views.get_services_api),
+
+    path('api/all-data/', views.get_all_data_api),
 ]
 
 

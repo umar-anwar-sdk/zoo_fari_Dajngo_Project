@@ -10,19 +10,12 @@ from home.models import UserCreateFrom
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Services
-from .serializers import ServicesSerializer
+from .models import Services, OurAnimals, topslider, Welcometext, Welcomelist, Offers, Contact, Address, Email
+from .serializers import (ServicesSerializer, AnimalSerializer, SliderSerializer, 
+                          WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer, 
+                          ContactSerializer, AddressSerializer, EmailSerializer)
 
 # Create your views here.
-
-
-@api_view(['GET'])
-def get_services_api(request):
-    services = Services.objects.all()
-    serializer = ServicesSerializer(services, many=True)
-    return Response(serializer.data)
-
-
 
 
 def home(request):
@@ -209,7 +202,33 @@ def custom_logout(request):
     return redirect('login')
 
 
-
+@api_view(['GET'])
+def get_all_data_api(request):
+    data = {
+        "sliders": topslider.objects.all(),
+        "welcome_text": Welcometext.objects.all(),
+        "welcome_list": Welcomelist.objects.all(),
+        "services": Services.objects.all(),
+        "animals": OurAnimals.objects.all(),
+        "offers": Offers.objects.all(),
+        "address": Address.objects.all(),
+        "email": Email.objects.all(),
+    }
+    return Response({
+        "status": "Success",
+        "sliders": SliderSerializer(data["sliders"], many=True).data,
+        "welcome": {
+            "text": WelcomeTextSerializer(data["welcome_text"], many=True).data,
+            "list": WelcomeListSerializer(data["welcome_list"], many=True).data,
+        },
+        "services": ServicesSerializer(data["services"], many=True).data,
+        "animals": AnimalSerializer(data["animals"], many=True).data,
+        "offers": OffersSerializer(data["offers"], many=True).data,
+        "contact_info": {
+            "address": AddressSerializer(data["address"], many=True).data,
+            "email": EmailSerializer(data["email"], many=True).data,
+        }
+    })
 
 
 
