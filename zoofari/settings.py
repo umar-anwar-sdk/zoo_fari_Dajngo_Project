@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'home',
     'widget_tweaks',
     'cart',
+    'rest_framework',
 ]
 CART_SESSION_ID = 'cart'
 
@@ -162,6 +164,7 @@ JAZZMIN_SETTINGS = {
 
     "copyright": "ZooFari",
 }
+
 
 
 # Email Configuration

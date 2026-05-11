@@ -8,9 +8,21 @@ from home.models import topslider, Welcometext, Welcomelist, Services, Call, Our
 from django.contrib.auth import authenticate, login, logout
 from home.models import UserCreateFrom
 
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Services
+from .serializers import ServicesSerializer
 
 # Create your views here.
+
+
+@api_view(['GET'])
+def get_services_api(request):
+    services = Services.objects.all()
+    serializer = ServicesSerializer(services, many=True)
+    return Response(serializer.data)
+
+
 
 
 def home(request):
