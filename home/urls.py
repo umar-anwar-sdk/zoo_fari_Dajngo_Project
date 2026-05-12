@@ -21,8 +21,22 @@ urlpatterns = [
     path('logout/', custom_logout, name='logout'),
     path("accounts/", include('django.contrib.auth.urls')),
 
-    path('api/all-data/', views.get_all_data_api),
+    path('api/home/', views.get_home_api),
+    path('api/about/', views.get_about_api),
+    path('api/services/', views.get_services_api),
+    path('api/animals/', views.get_animals_api),
+    path('api/offers/', views.get_offers_api),
+    path('api/contact/', views.get_contact_api),
+    path('api/address/', views.get_address_api),
+    path('api/email/', views.get_email_api),
+
+    path('api/submit_contact/', views.submit_contact_api, name='submit_contact_api'),
+
+    path('api/contact/update/<int:pk>/', views.update_contact_api),
+    path('api/contact/delete/<int:pk>/', views.delete_contact_api),
+
 ]
+
 
 
 

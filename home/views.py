@@ -15,7 +15,9 @@ from .serializers import (ServicesSerializer, AnimalSerializer, SliderSerializer
                           WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer, 
                           ContactSerializer, AddressSerializer, EmailSerializer)
 
+
 # Create your views here.
+
 
 
 def home(request):
@@ -50,9 +52,11 @@ def about(request):
     context = {
         'wtext': wtext,
         'wlist': wlist,
+    
 
     }
     return render(request, 'about.html', context)
+
 
 
 def services(request):
@@ -62,6 +66,7 @@ def services(request):
         'service': service,
         'call': call,
     }
+    
 
     return render(request, 'service.html', context)
 
@@ -203,34 +208,129 @@ def custom_logout(request):
 
 
 @api_view(['GET'])
-def get_all_data_api(request):
+def get_home_api(request):
     data = {
         "sliders": topslider.objects.all(),
-        "welcome_text": Welcometext.objects.all(),
-        "welcome_list": Welcomelist.objects.all(),
-        "services": Services.objects.all(),
-        "animals": OurAnimals.objects.all(),
-        "offers": Offers.objects.all(),
-        "address": Address.objects.all(),
-        "email": Email.objects.all(),
+       
     }
     return Response({
         "status": "Success",
         "sliders": SliderSerializer(data["sliders"], many=True).data,
-        "welcome": {
-            "text": WelcomeTextSerializer(data["welcome_text"], many=True).data,
-            "list": WelcomeListSerializer(data["welcome_list"], many=True).data,
-        },
-        "services": ServicesSerializer(data["services"], many=True).data,
-        "animals": AnimalSerializer(data["animals"], many=True).data,
-        "offers": OffersSerializer(data["offers"], many=True).data,
-        "contact_info": {
-            "address": AddressSerializer(data["address"], many=True).data,
-            "email": EmailSerializer(data["email"], many=True).data,
-        }
+    
+        
     })
 
+@api_view(['GET'])
+def get_about_api(request):
+    data = {
+        "welcome_text": Welcometext.objects.first(),
+        "welcome_list": Welcomelist.objects.all(),
+    }
+    return Response({
+            "status": "Success",
+            "welcome_text": WelcomeTextSerializer(data["welcome_text"]).data,
+            "welcome_list": WelcomeListSerializer(data["welcome_list"], many=True).data,
+        })
+
+
+@api_view(['GET'])
+def get_services_api(request):
+    data = {
+
+        "services": Services.objects.all(),
+    }
+
+    return Response({
+        "status": "Success",
+        "services": ServicesSerializer(data["services"], many=True).data,
+        })
+
+@api_view(['GET'])
+def get_animals_api(request):
+    data = {
+
+    "animals": OurAnimals.objects.all(),
+    }
+    return Response({
+
+        "status": "Success",
+        "animals": AnimalSerializer(data["animals"], many=True).data,
+
+        })
+
+
+@api_view(['GET'])
+def get_offers_api(request): 
+    data = {
+        "offers": Offers.objects.all(),
+    }
+    return Response({
+        "status": "Success",
+        "offers": OffersSerializer(data["offers"], many=True).data,
+        })   
+
+@api_view(['GET'])
+def get_contact_api(request):
+    data = {
+         "contact": Contact.objects.all(),
+        }
+    return Response({
+        "status": "Success",
+        "contact": ContactSerializer(data["contact"], many=True).data,
+        })
+
+@api_view(['GET'])
+def get_address_api(request): 
+    data = {
+         "address": Address.objects.first(),
+        }
+    return Response({
+        "status": "Success",
+        "address": AddressSerializer(data["address"]).data,
+        })   
+         
+@api_view(['GET'])
+def get_email_api(request):
+    data = {
+         "email": Email.objects.first(),
+        }
+    return Response({
+        "status": "Success",
+        "email": EmailSerializer(data["email"]).data,
+        })     
+    
+@api_view(['POST'])
+def submit_contact_api(request):
+    serializer = ContactSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"status": "Success", "message": "Contact information submitted successfully."})
+    else:
+        return Response({"status": "Error", "message": "Invalid data.", "errors": serializer.errors}, status=400)
+
+
+@api_view(['PATCH'])
+def update_contact_api(request, pk): 
+    try:
+        contact = Contact.objects.get(pk=pk)
+    except Contact.DoesNotExist:
+        return Response({"message": "Not found!"}, status=404)
+
+
+    serializer = ContactSerializer(contact, data=request.data, partial=True)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"status": "Updated", "data": serializer.data})
+    return Response(serializer.errors, status=400)
 
 
 
-
+@api_view(['DELETE'])
+def delete_contact_api(request, pk):
+    try:
+        contact = Contact.objects.get(pk=pk)
+        contact.delete()
+        return Response({"message": "Contact deleted successfully!"}, status=204)
+    except Contact.DoesNotExist:
+        return Response({"message": "It was already not there."}, status=404)
