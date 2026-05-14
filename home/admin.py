@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from home.models import topslider, Welcomelist, Welcometext, Services, Call, OurAnimals, Category, Offers, Contact, \
+from home.models import Topslider, Welcomelist, Welcometext, Services, Call, OurAnimals, Category, Offers, Contact, \
     Customer, Address, Email
 
 
@@ -11,7 +11,7 @@ class topsliderAdmin(admin.ModelAdmin):
     list_display = ['image']
 
 
-admin.site.register(topslider)
+admin.site.register(Topslider)
 
 
 class WelcometextAdmin(admin.ModelAdmin):

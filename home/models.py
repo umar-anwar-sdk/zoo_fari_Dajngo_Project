@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django import forms
 
 
-class topslider(models.Model):
+class Topslider(models.Model):
     image = models.ImageField(upload_to='images/')
 
 
