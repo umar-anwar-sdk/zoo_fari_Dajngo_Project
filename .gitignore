@@ -4,3 +4,8 @@ __pycache__
 *.pyc
 *.pyo
 media
+.pyc
+home/__pycache__
+home/migrations/__pycache__
+home/migrations/*.pyc
+home/migrations/*.pyo

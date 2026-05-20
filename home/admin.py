@@ -1,87 +1,38 @@
 from django.contrib import admin
+from .models import Topslider, Welcometext, Welcomelist, Services, Call, Offers, Contact, Address, Email
 
-from home.models import Topslider, Welcomelist, Welcometext, Services, Call, OurAnimals, Category, Offers, Contact, \
-    Customer, Address, Email
+@admin.register(Topslider)
+class TopsliderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'image')
 
-
-# Register your models here.
-
-
-class topsliderAdmin(admin.ModelAdmin):
-    list_display = ['image']
-
-
-admin.site.register(Topslider)
-
-
+@admin.register(Welcometext)
 class WelcometextAdmin(admin.ModelAdmin):
-    list_display = ['text']
+    list_display = ('title',)
 
-
-admin.site.register(Welcometext)
-
-
+@admin.register(Welcomelist)
 class WelcomelistAdmin(admin.ModelAdmin):
-    list_display = ['list']
+    list_display = ('list',)
 
-
-admin.site.register(Welcomelist)
-
-
+@admin.register(Services)
 class ServicesAdmin(admin.ModelAdmin):
-    list_display = ['icon', 'title', 'text']
+    list_display = ('title',)
 
-
-admin.site.register(Services)
-
-
+@admin.register(Call)
 class CallAdmin(admin.ModelAdmin):
-    list_display = ['number']
+    list_display = ('number',)
 
-
-admin.site.register(Call)
-
-
-class OurAnimalsAdmin(admin.ModelAdmin):
-    list_display = ['name', 'image']
-
-
-admin.site.register(OurAnimals)
-
-
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name']
-
-
-admin.site.register(Category)
-
-
+@admin.register(Offers)
 class OffersAdmin(admin.ModelAdmin):
-    list_display = ['number', 'name', 'payment', 'list1', 'list2', 'list3']
+    list_display = ('name', 'price', 'number')
 
-
-admin.site.register(Offers)
-
-
+@admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'subject', 'message']
+    list_display = ('name', 'email', 'subject')
 
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('name',)
 
-admin.site.register(Contact)
-
-
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first', 'last', 'email', 'phone', 'address', 'city', 'state', 'zip', 'adult', 'kids']
-
-
-admin.site.register(Customer)
-
-
-
-
-
-
-admin.site.register(Address)
-
-
-admin.site.register(Email)
+@admin.register(Email)
+class EmailAdmin(admin.ModelAdmin):
+    list_display = ('email',)
