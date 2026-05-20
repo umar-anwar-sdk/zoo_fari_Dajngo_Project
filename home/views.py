@@ -10,7 +10,9 @@ from home.models import UserCreateFrom
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Category, User
+from .models import Category
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from .models import Services, OurAnimals, Topslider, Welcometext, Welcomelist, Offers, Contact, Address, Email
 from .serializers import (CallSerializer, CategorySerializer, CustomerSerializer, MembershipCardSerializer, MembershipSerializer, OurAnimalsSerializer, ServicesSerializer, SliderSerializer, UserRegistrationSerializer, 
                           WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer, 

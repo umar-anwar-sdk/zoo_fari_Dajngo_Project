@@ -1,1 +1,61 @@
 Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/home/models.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:16:13
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/zoofari/urls.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:27:33
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/home/models.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:28:43
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/home/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:29:15
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/home/migrations/__init__.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:29:26
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
+/home/umer/Desktop/MY_git/Zoofari/zoo_fari_Dajngo_Project/home/migrations/__init__.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 20, 2026 - 06:30:29
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Watching for file changes with StatReloader
