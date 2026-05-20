@@ -1,20 +1,21 @@
 from rest_framework import serializers
-from .models import Topslider, Welcometext, Welcomelist, Services, Call, Offers, Contact, Address, Email
+from home.models import Call, Category, MembershipCardOrder, User,Address, Contact, Customer, Email, MembershipOrder, Offers, Services, OurAnimals, Topslider, Welcometext, Welcomelist
 
-class TopsliderSerializer(serializers.ModelSerializer):
+class SliderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topslider
         fields = '__all__'
 
-class WelcometextSerializer(serializers.ModelSerializer):
+class WelcomeTextSerializer(serializers.ModelSerializer):
     class Meta:
         model = Welcometext
         fields = '__all__'
 
-class WelcomelistSerializer(serializers.ModelSerializer):
+class WelcomeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Welcomelist
         fields = '__all__'
+
 
 class ServicesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,15 +27,73 @@ class CallSerializer(serializers.ModelSerializer):
         model = Call
         fields = '__all__'
 
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'        
+
+
+class OurAnimalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OurAnimals
+        fields = '__all__'
+
+
+
 class OffersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offers
         fields = '__all__'
 
+
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembershipOrder
+        fields = '__all__'        
+
+
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = '__all__'
+
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'confirm_password']
+
+   
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This Email Already Exists")
+        return value
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password') 
+        user = User.objects.create_user(**validated_data) 
+        return user
+
+
+class MembershipCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MembershipCardOrder
+        fields = '__all__'
+
+
+
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
