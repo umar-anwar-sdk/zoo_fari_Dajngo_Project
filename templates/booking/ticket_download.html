@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3>ZooFari Ticket</h3>
+            <p class="text-muted mb-0">Booking reference: {{ ticket.booking.booking_reference }}</p>
+          </div>
+          <div>
+            <a href="{% url 'booking:ticket_download' ticket.ticket_id %}" class="btn btn-outline-secondary">Refresh</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-8">
+            <p><strong>Customer:</strong> {{ ticket.booking.full_name }}</p>
+            <p><strong>Package/Ticket:</strong>
+              {% if ticket.booking.selected_ticket %}
+                {{ ticket.booking.selected_ticket.name }}
+              {% elif ticket.booking.selected_package %}
+                {{ ticket.booking.selected_package.package_name }}
+              {% else %}
+                {{ ticket.booking.items.first.ticket_type.name|default:ticket.booking.items.first.package.package_name }}
+              {% endif %}
+            </p>
+            <p><strong>Quantity:</strong> {{ ticket.booking.items.count }}</p>
+            <p><strong>Visit Date:</strong> {{ ticket.booking.visit_date }}</p>
+            <p><strong>Total Paid:</strong> PKR {{ ticket.booking.final_total }}</p>
+            <p><strong>Status:</strong> {{ ticket.status|capfirst }}</p>
+          </div>
+          <div class="col-md-4 text-center">
+            {% if ticket.qr_code %}
+              <img src="{{ ticket.qr_code.url }}" alt="QR code" class="img-fluid mb-3" />
+            {% else %}
+              <div class="border rounded p-4">QR code will appear here.</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="mt-4">
+          <a href="{% url 'booking:checkout' %}" class="btn btn-primary">Book Another Ticket</a>
+          <button class="btn btn-outline-secondary" onclick="window.print()">Print Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

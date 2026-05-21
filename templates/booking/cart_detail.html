@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-6">Your Cart</h1>
+        <p class="text-muted">Review your selected tickets and confirm quantity before checkout.</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="{% url 'booking:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+      </div>
+    </div>
+    {% if cart_items %}
+      <div class="table-responsive">
+        <table class="table align-middle table-bordered">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+            <tr>
+              <td>
+                {% if item.ticket_type %}
+                  {{ item.ticket_type.name }}
+                {% else %}
+                  {{ item.package.package_name }}
+                {% endif %}
+              </td>
+              <td>PKR {{ item.unit_price }}</td>
+              <td>
+                <form method="post" action="{% url 'booking:update_cart_item' item.id %}">
+                  {% csrf_token %}
+                  <div class="input-group input-group-sm">
+                    <input type="number" name="quantity" min="1" value="{{ item.quantity }}" class="form-control">
+                    <button class="btn btn-outline-secondary" type="submit">Update</button>
+                  </div>
+                </form>
+              </td>
+              <td>PKR {{ item.line_total }}</td>
+              <td>
+                <a href="{% url 'booking:remove_cart_item' item.id %}" class="btn btn-sm btn-outline-danger">Remove</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="row justify-content-end">
+        <div class="col-md-5">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Order Summary</h5>
+              <p class="mb-2">Original total: <strong>PKR {{ totals.original_total }}</strong></p>
+              <p class="mb-2">Discount: <strong>PKR {{ totals.discount_amount }}</strong></p>
+              <p class="mb-4">Final total: <strong>PKR {{ totals.final_total }}</strong></p>
+              {% if totals.best_offer %}
+                <div class="alert alert-success">
+                  Best offer applied: <strong>{{ totals.best_offer.title }}</strong>
+                </div>
+              {% endif %}
+              <a href="{% url 'booking:checkout' %}" class="btn btn-primary w-100">Checkout Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if totals.active_offers %}
+      <div class="row mt-4">
+        <div class="col-12">
+          <h5>Available Offers</h5>
+          <div class="row g-3">
+            {% for offer in totals.active_offers %}
+              <div class="col-md-4">
+                <div class="card p-3 h-100">
+                  <h6>{{ offer.title }}</h6>
+                  <p class="small mb-1">{{ offer.description }}</p>
+                  <p class="mb-0">
+                    <strong>{{ offer.discount_value }}{% if offer.discount_type == 'percentage' %}%{% endif %}</strong>
+                  </p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% else %}
+      <div class="alert alert-info">Your cart is currently empty. Browse tickets to add one.</div>
+      <a href="{% url 'booking:ticket_list' %}" class="btn btn-outline-primary">Browse Tickets</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

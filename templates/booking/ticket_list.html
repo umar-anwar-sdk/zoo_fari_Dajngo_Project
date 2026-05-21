@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row g-4 mb-5 align-items-end">
+      <div class="col-lg-8">
+        <p><span class="text-primary me-2">#</span>Book Tickets</p>
+        <h1 class="display-5 mb-0">Choose your ticket package and quantity</h1>
+      </div>
+      <div class="col-lg-4 text-end">
+        <a href="{% url 'booking:cart_detail' %}" class="btn btn-outline-primary">View Cart</a>
+      </div>
+    </div>
+    <div class="row gy-4">
+      {% for ticket in ticket_types %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ ticket.name }}</h5>
+              <p class="card-text">{{ ticket.description }}</p>
+              <p class="h4 text-primary">PKR {{ ticket.price }}</p>
+              <form method="post" action="{% url 'booking:add_to_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_type" value="{{ ticket.id }}">
+                <div class="input-group mb-3">
+                  <button type="button" class="btn btn-outline-secondary quantity-decrease">-</button>
+                  <input type="number" name="quantity" class="form-control text-center quantity-input" value="1" min="1">
+                  <button type="button" class="btn btn-outline-secondary quantity-increase">+</button>
+                </div>
+                <p class="mb-2">Total: <span class="item-total">PKR {{ ticket.price }}</span></p>
+                <button class="btn btn-primary w-100" type="submit">Add to Cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="row gy-4 mt-4">
+      <div class="col-12">
+        <h3 class="mb-4">Family Packages</h3>
+      </div>
+      {% for package in packages %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ package.package_name }}</h5>
+              <p class="card-text">{{ package.benefits }}</p>
+              <p class="text-muted mb-2">For {{ package.number_of_people }} people</p>
+              <p class="h4 text-primary">PKR {{ package.package_price }}</p>
+              <form method="post" action="{% url 'booking:add_to_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="package" value="{{ package.id }}">
+                <div class="input-group mb-3">
+                  <button type="button" class="btn btn-outline-secondary quantity-decrease">-</button>
+                  <input type="number" name="quantity" class="form-control text-center quantity-input" value="1" min="1">
+                  <button type="button" class="btn btn-outline-secondary quantity-increase">+</button>
+                </div>
+                <p class="mb-2">Total: <span class="item-total">PKR {{ package.package_price }}</span></p>
+                <button class="btn btn-primary w-100" type="submit">Add to Cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="row gy-4 mt-5">
+      <div class="col-12">
+        <h3 class="mb-4">Active Offers</h3>
+      </div>
+      {% for offer in offers %}
+        <div class="col-md-4">
+          <div class="card border-primary shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ offer.title }}</h5>
+              <p class="card-text">{{ offer.description }}</p>
+              <p class="mb-2">Type: <strong>{{ offer.discount_type|capfirst }}</strong></p>
+              <p class="mb-2">Value: <strong>{{ offer.discount_value }}{% if offer.discount_type == 'percentage' %}%{% endif %}</strong></p>
+              <p class="mb-2 text-muted">Valid: {{ offer.start_date }} - {{ offer.end_date }}</p>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-secondary">No active offers at the moment.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.quantity-decrease').forEach(function(button) {
+    button.addEventListener('click', function() {
+      const input = this.closest('form').querySelector('.quantity-input');
+      const price = parseFloat(this.closest('form').querySelector('.item-total').innerText.replace(/[^0-9.]/g, ''));
+      let value = parseInt(input.value, 10) || 1;
+      if (value > 1) {
+        value -= 1;
+        input.value = value;
+      }
+      updateTotal(this.closest('form'));
+    });
+  });
+  document.querySelectorAll('.quantity-increase').forEach(function(button) {
+    button.addEventListener('click', function() {
+      const input = this.closest('form').querySelector('.quantity-input');
+      input.value = parseInt(input.value, 10) + 1;
+      updateTotal(this.closest('form'));
+    });
+  });
+  document.querySelectorAll('.quantity-input').forEach(function(input) {
+    input.addEventListener('input', function() {
+      if (parseInt(this.value, 10) < 1 || isNaN(this.value)) {
+        this.value = 1;
+      }
+      updateTotal(this.closest('form'));
+    });
+  });
+  function updateTotal(form) {
+    const priceText = form.querySelector('.h4').innerText.replace(/[^0-9.]/g, '');
+    const quantity = parseInt(form.querySelector('.quantity-input').value, 10) || 1;
+    const total = (parseFloat(priceText) * quantity).toFixed(2);
+    form.querySelector('.item-total').innerText = 'PKR ' + total;
+  }
+</script>
+{% endblock %}

@@ -295,6 +295,160 @@
             ]
         },
         {
+            "name": "Booking",
+            "item": [
+                {
+                    "name": "List Ticket Types",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/ticket-types/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "ticket-types",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "List Offers",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/offers/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "offers",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Cart Item",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"ticket_type\": 1,\n  \"quantity\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/cart/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "cart",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Calculate Cart Total",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"cart_items\": [\n    {\"ticket_type\": 1, \"quantity\": 3}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/bookings/calculate/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "bookings",
+                                "calculate",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Booking",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"full_name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone_number\": \"03001234567\",\n  \"cnic\": \"12345-1234567-1\",\n  \"city\": \"Karachi\",\n  \"address\": \"123 Zoo Lane\",\n  \"location_key_points\": \"Near main gate\",\n  \"number_of_members\": 3,\n  \"visit_date\": \"2026-12-01\",\n  \"notes\": \"Please prepare tickets.\",\n  \"cart_items\": [\n    {\"ticket_type\": 1, \"quantity\": 3}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/bookings/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "bookings",
+                                ""
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Download Issued Ticket PDF",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/booking/issued-tickets/1/download_pdf/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "booking",
+                                "issued-tickets",
+                                "1",
+                                "download_pdf",
+                                ""
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "name": "Tickets",
             "item": [
                 {

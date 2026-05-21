@@ -1,18 +1,42 @@
 from django.contrib import admin
-from .models import TicketType, Booking, IssuedTicket
+from .models import TicketType, Offer, CartItem, Booking, BookingItem, IssuedTicket
 
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'status')
+    list_display = ('name', 'price', 'status', 'created_at')
     list_filter = ('status',)
     search_fields = ('name', 'description')
 
+
+@admin.register(Offer)
+class OfferAdmin(admin.ModelAdmin):
+    list_display = ('title', 'discount_type', 'discount_value', 'status', 'start_date', 'end_date')
+    list_filter = ('status', 'discount_type')
+    search_fields = ('title', 'description')
+    filter_horizontal = ('applicable_tickets', 'applicable_packages')
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'session_key', 'ticket_type', 'package', 'quantity', 'unit_price', 'updated_at')
+    list_filter = ('ticket_type', 'package')
+    search_fields = ('ticket_type__name', 'package__package_name', 'session_key')
+
+
+class BookingItemInline(admin.TabularInline):
+    model = BookingItem
+    extra = 0
+    readonly_fields = ('unit_price', 'line_total')
+
+
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'phone_number', 'visit_date', 'payment_status', 'created_at')
+    list_display = ('full_name', 'email', 'phone_number', 'visit_date', 'payment_status', 'original_total', 'discount_amount', 'final_total', 'created_at')
     list_filter = ('payment_status', 'visit_date')
-    search_fields = ('full_name', 'email', 'cnic', 'phone_number')
-    readonly_fields = ('created_at',)
+    search_fields = ('full_name', 'email', 'cnic', 'phone_number', 'booking_reference')
+    readonly_fields = ('created_at', 'booking_reference', 'original_total', 'discount_amount', 'final_total')
+    inlines = [BookingItemInline]
+
 
 @admin.register(IssuedTicket)
 class IssuedTicketAdmin(admin.ModelAdmin):

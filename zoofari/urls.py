@@ -40,9 +40,10 @@ urlpatterns = [
     
     # Template-based Website Frontend
     path('', include('home.urls')),
+    path('booking/', include('booking.template_urls')),
 
     # REST APIs for React/Mobile
-    path('api/auth/', include('users.urls')),
+    path('api/auth/', include(('users.urls', 'users'), namespace='users')),
     path('api/core/', include('core.urls')),
     path('api/booking/', include('booking.urls')),
 

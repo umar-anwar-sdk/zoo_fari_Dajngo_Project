@@ -8,21 +8,24 @@
                 <h2>Login Your Account</h2>
                 <form method="POST">
                     {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
                     {% for field in form %}
-                    <div class="mb-3">
-                        <label>{{ field.label_tag }}</label>
-                    </div>
-                    <div class="mb-3">
-                        {{ field.errors }}
-                        {{ field|add_class:"form-control" }} <!-- Apply form-control class -->
-                    </div>
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field|add_class:"form-control" }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'password_reset' %}" class="text-decoration-none">Forgot Password</a>
-                        <button class="btn btn-success rounded-pill" type="submit">Login</button> <!-- Styled as Signup button -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">Forgot Password?</a>
+                        <button class="btn btn-success rounded-pill" type="submit">Login</button>
                     </div>
                     <div class="mt-3 text-center">
-                        <a href="{% url 'signup' %}" class="text-decoration-none">Create Your Account &rarr;</a>
+                        <span>Don't have an account?</span>&nbsp;<a href="{% url 'register' %}" class="text-decoration-none">Create one</a>
                     </div>
                 </form>
             </div>

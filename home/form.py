@@ -11,3 +11,16 @@ class MyForm(forms.Form):
     zip = forms.CharField(max_length=10)
     adult = forms.IntegerField()
     kids = forms.IntegerField()
+
+
+class CustomLoginForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        label='Email or Username',
+        widget=forms.TextInput(attrs={'placeholder': 'Email or Username'})
+    )
+    password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+    remember_me = forms.BooleanField(required=False, initial=False, label='Remember me')

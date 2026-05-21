@@ -18,7 +18,10 @@ urlpatterns = [
     path('form/', form, name='form'),
     path('thankyou/', thankyou, name = 'thankyou'),
     path("signup/", views.signup, name='signup'),
-    path('logout/', custom_logout, name='logout'),
+    path("register/", views.signup, name='register'),
+    path("login/", views.custom_login, name='site_login'),
+    path('logout/', custom_logout, name='site_logout'),
+    path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path("accounts/", include('django.contrib.auth.urls')),
 
 

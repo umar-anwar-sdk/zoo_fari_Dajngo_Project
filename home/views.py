@@ -1,25 +1,23 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.core.mail import send_mail
-from .form import MyForm
+from .form import MyForm, CustomLoginForm
 from home.models import Topslider, Welcometext, Welcomelist, Services, Call, OurAnimals, Offers, Contact, Customer, \
-    MembershipCardOrder, MembershipOrder, Address, Email
+    MembershipCardOrder, MembershipOrder, Address, Email, UserCreateFrom
 from django.contrib.auth import authenticate, login, logout
-from home.models import UserCreateFrom
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Category
-from django.contrib.auth import get_user_model
-User = get_user_model()
-from .models import Services, OurAnimals, Topslider, Welcometext, Welcomelist, Offers, Contact, Address, Email
 from .serializers import (CallSerializer, CategorySerializer, CustomerSerializer, MembershipCardSerializer, MembershipSerializer, OurAnimalsSerializer, ServicesSerializer, SliderSerializer, UserRegistrationSerializer, 
                           WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer, 
                           ContactSerializer, AddressSerializer, EmailSerializer)
 
-
-# Create your views here.
 
 
 
@@ -137,19 +135,16 @@ def form(request):
     if request.method == 'POST':
         form = MyForm(request.POST)
         if form.is_valid():
-            # Process the form data
             first = form.cleaned_data['first']
             last = form.cleaned_data['last']
             email = form.cleaned_data['email']
-            phone = form.cleaned_data.get('phone', '')  # Use get() to avoid KeyError
+            phone = form.cleaned_data.get('phone', '') 
             address = form.cleaned_data['address']
             city = form.cleaned_data['city']
             state = form.cleaned_data['state']
             zip_code = form.cleaned_data['zip']
             adult = form.cleaned_data['adult']
             kids = form.cleaned_data['kids']
-
-            # Save form submission to the database
             submission = Customer.objects.create(
                 first=first,
                 last=last,
@@ -163,7 +158,6 @@ def form(request):
                 kids=kids
             )
 
-            # Sending email
             subject = 'Form Submission'
             message = f'''
             Name: {first} {last}
@@ -174,8 +168,6 @@ def form(request):
             Kids: {kids}
             '''
             send_mail(subject, message, 'your_email@example.com', [email])
-
-            # Optionally, you can redirect the user to a thank you page
             return render(request, 'thank_you.html', {'first': first})
     else:
         form = MyForm()
@@ -184,30 +176,79 @@ def form(request):
 def thankyou(request):
     return render(request, 'thank_you.html')
 
-# registration
+def get_login_redirect_url(user):
+    if user.is_superuser or getattr(user, 'role', None) == 'admin':
+        return reverse('admin:index')
+    if getattr(user, 'role', None) == 'staff':
+        return reverse('staff_dashboard')
+    return reverse('home')
+
+
+def custom_login(request):
+    if request.user.is_authenticated:
+        return redirect(get_login_redirect_url(request.user))
+
+    if request.method == 'POST':
+        form = CustomLoginForm(request.POST)
+        if form.is_valid():
+            username_or_email = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            remember_me = form.cleaned_data['remember_me']
+            user = authenticate(request, username=username_or_email, password=password)
+            if user is None:
+                try:
+                    user_obj = User.objects.get(email__iexact=username_or_email)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except User.DoesNotExist:
+                    user = None
+
+            if user is not None:
+                login(request, user)
+                if remember_me:
+                    request.session.set_expiry(None)
+                else:
+                    request.session.set_expiry(0)
+                return redirect(get_login_redirect_url(user))
+            form.add_error(None, 'Invalid email/username or password.')
+    else:
+        form = CustomLoginForm()
+
+    return render(request, 'registration/login.html', {'form': form})
+
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreateFrom(request.POST)
         if form.is_valid():
             new_user = form.save()
-            new_user = authenticate(
+            user = authenticate(
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'],
             )
-            login(request, new_user)
-            return redirect('form')
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            return redirect('site_login')
     else:
         form = UserCreateFrom()
     context = {
         'form': form,
     }
-    return render(request, 'registration/signup.html',context)
+    return render(request, 'registration/signup.html', context)
 
 
 def custom_logout(request):
     logout(request)
-    # Redirect to a desired page after logout
-    return redirect('login')
+    return redirect('site_login')
+
+
+def staff_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.user.role != 'staff' and not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the staff dashboard.')
+        return redirect('home')
+    return render(request, 'staff_dashboard.html')
 
 
 

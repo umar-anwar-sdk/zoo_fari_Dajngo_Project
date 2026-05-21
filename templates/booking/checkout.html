@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row g-4 mb-5 align-items-center">
+      <div class="col-lg-8">
+        <p><span class="text-primary me-2">#</span>Checkout</p>
+        <h1 class="display-5 mb-0">Complete your booking details</h1>
+      </div>
+      <div class="col-lg-4 text-end">
+        <a href="{% url 'booking:cart_detail' %}" class="btn btn-outline-secondary">Back to Cart</a>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Visitor information</h5>
+            <form method="post" novalidate>
+              {% csrf_token %}
+              {% for field in form %}
+                <div class="mb-3">
+                  <label class="form-label">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+              <button type="submit" class="btn btn-primary">Confirm Booking</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title">Order summary</h5>
+            {% for item in cart_items %}
+              <div class="d-flex justify-content-between mb-2">
+                <div>
+                  {% if item.ticket_type %}
+                    {{ item.ticket_type.name }}
+                  {% else %}
+                    {{ item.package.package_name }}
+                  {% endif %}
+                  <div class="small text-muted">Qty: {{ item.quantity }}</div>
+                </div>
+                <div><strong>PKR {{ item.line_total }}</strong></div>
+              </div>
+            {% endfor %}
+            <hr>
+            <p class="mb-2">Original price: <strong>PKR {{ totals.original_total }}</strong></p>
+            <p class="mb-2">Discount: <strong>PKR {{ totals.discount_amount }}</strong></p>
+            <h4 class="mb-0">Total paid: PKR {{ totals.final_total }}</h4>
+            {% if totals.best_offer %}
+              <p class="mt-3 text-success">Best offer applied: {{ totals.best_offer.title }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
