@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
+from users.models import User
 from .models import TicketType, Offer
 from core.models import FamilyPackage
 
@@ -50,7 +51,7 @@ class BookingAPITestCase(APITestCase):
         self.assertEqual(Decimal(str(calculate_response.data['discount_amount'])), Decimal('600.00'))
         self.assertEqual(Decimal(str(calculate_response.data['final_total'])), Decimal('5400.00'))
 
-    def test_booking_checkout_creates_issued_ticket(self):
+    def test_booking_checkout_creates_pending_booking(self):
         payload = {
             'full_name': 'Test User',
             'email': 'test@example.com',
@@ -71,4 +72,33 @@ class BookingAPITestCase(APITestCase):
         self.assertEqual(response.data['original_total'], '6000.00')
         self.assertEqual(response.data['discount_amount'], '600.00')
         self.assertEqual(response.data['final_total'], '5400.00')
-        self.assertIn('issued_ticket', response.data)
+        self.assertEqual(response.data['approval_status'], 'pending')
+        self.assertIsNone(response.data.get('issued_ticket'))
+
+    def test_staff_can_approve_booking_and_issue_ticket(self):
+        booking_payload = {
+            'full_name': 'Test User',
+            'email': 'test@example.com',
+            'phone_number': '03001234567',
+            'cnic': '12345-1234567-1',
+            'city': 'Karachi',
+            'address': '123 Zoo Lane',
+            'location_key_points': 'Near main gate',
+            'number_of_members': 3,
+            'visit_date': '2026-12-01',
+            'notes': 'Please reserve a family spot.',
+            'cart_items': [
+                {'ticket_type': self.ticket.id, 'quantity': 3}
+            ]
+        }
+        booking_response = self.client.post('/api/booking/bookings/', booking_payload, format='json')
+        self.assertEqual(booking_response.status_code, status.HTTP_201_CREATED)
+        booking_id = booking_response.data['id']
+
+        staff_user = User.objects.create_user(username='staffuser', password='staffpass', role='staff')
+        self.client.force_authenticate(user=staff_user)
+
+        approve_response = self.client.post(f'/api/booking/bookings/{booking_id}/approve/', {'approval_notes': 'Approved for issue.'}, format='json')
+        self.assertEqual(approve_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(approve_response.data['approval_status'], 'approved')
+        self.assertIsNotNone(approve_response.data.get('issued_ticket'))

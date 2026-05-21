@@ -14,9 +14,20 @@
         <p><strong>Visit Date:</strong> {{ booking.visit_date }}</p>
         <p><strong>Members:</strong> {{ booking.number_of_members }}</p>
         <p><strong>Total Paid:</strong> PKR {{ booking.final_total }}</p>
-        <p><strong>Status:</strong> {{ booking.payment_status|capfirst }}</p>
+        <p><strong>Payment Status:</strong> {{ booking.payment_status|capfirst }}</p>
+        <p><strong>Approval Status:</strong>
+          {% if booking.approval_status == 'approved' %}
+            <span class="badge bg-success">Approved</span>
+          {% elif booking.approval_status == 'rejected' %}
+            <span class="badge bg-danger">Rejected</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">Pending Approval</span>
+          {% endif %}
+        </p>
         {% if booking.issued_ticket %}
           <a href="{% url 'booking:ticket_download' booking.issued_ticket.ticket_id %}" class="btn btn-primary">View Ticket</a>
+        {% elif booking.approval_status == 'pending' %}
+          <p class="text-muted">Your ticket will be generated after approval.</p>
         {% endif %}
       </div>
     </div>

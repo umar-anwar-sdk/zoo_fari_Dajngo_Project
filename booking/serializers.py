@@ -24,6 +24,8 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
 class BookingItemSerializer(serializers.ModelSerializer):
+    ticket_type = serializers.PrimaryKeyRelatedField(queryset=TicketType.objects.all(), required=False, allow_null=True)
+    package = serializers.PrimaryKeyRelatedField(queryset=FamilyPackage.objects.all(), required=False, allow_null=True)
     line_total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
@@ -42,6 +44,8 @@ class BookingItemSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    ticket_type = serializers.PrimaryKeyRelatedField(queryset=TicketType.objects.all(), required=False, allow_null=True)
+    package = serializers.PrimaryKeyRelatedField(queryset=FamilyPackage.objects.all(), required=False, allow_null=True)
     line_total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
@@ -88,10 +92,10 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'full_name', 'email', 'phone_number', 'cnic', 'city', 'address',
             'location_key_points', 'number_of_members', 'visit_date', 'offer', 'original_total',
-            'discount_amount', 'final_total', 'payment_status', 'notes', 'booking_reference',
+            'discount_amount', 'final_total', 'approval_status', 'payment_status', 'notes', 'booking_reference',
             'created_at', 'items', 'cart_items', 'issued_ticket',
         ]
-        read_only_fields = ['id', 'user', 'original_total', 'discount_amount', 'final_total', 'booking_reference', 'created_at', 'issued_ticket']
+        read_only_fields = ['id', 'user', 'original_total', 'discount_amount', 'final_total', 'approval_status', 'booking_reference', 'created_at', 'issued_ticket']
 
     def validate(self, attrs):
         cart_items = attrs.get('cart_items', None)
@@ -125,8 +129,9 @@ class BookingSerializer(serializers.ModelSerializer):
             booking.offer = summary['best_offer']
         booking.calculate_totals()
         booking.save()
-        from .utils import generate_qr_code
-        ticket = IssuedTicket.objects.create(booking=booking)
-        ticket.qr_code.save(f'{ticket.ticket_id}.png', generate_qr_code(str(ticket.ticket_id)))
-        ticket.save()
+        if booking.approval_status == 'approved':
+            from .utils import generate_qr_code
+            ticket = IssuedTicket.objects.create(booking=booking)
+            ticket.qr_code.save(f'{ticket.ticket_id}.png', generate_qr_code(str(ticket.ticket_id)))
+            ticket.save()
         return booking

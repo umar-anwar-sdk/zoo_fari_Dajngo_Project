@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from core.models import FamilyPackage
 from users.models import User
+from .utils import generate_qr_code
 import uuid
 from decimal import Decimal
 
@@ -121,6 +122,12 @@ class Booking(models.Model):
     original_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     final_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    approval_status = models.CharField(max_length=20, choices=(
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ), default='pending')
+    approval_notes = models.TextField(blank=True)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     notes = models.TextField(blank=True)
     booking_reference = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -128,6 +135,28 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking {self.booking_reference} by {self.full_name}"
+
+    def approve(self):
+        self.approval_status = 'approved'
+        self.approval_notes = ''
+        self.save()
+        return self.issue_ticket()
+
+    def reject(self, notes=''):
+        self.approval_status = 'rejected'
+        self.approval_notes = notes
+        self.save()
+        if hasattr(self, 'issued_ticket'):
+            self.issued_ticket.status = 'cancelled'
+            self.issued_ticket.save()
+        return self
+
+    def issue_ticket(self):
+        ticket, created = IssuedTicket.objects.get_or_create(booking=self)
+        if created or not ticket.qr_code:
+            ticket.qr_code.save(f'{ticket.ticket_id}.png', generate_qr_code(str(ticket.ticket_id)))
+            ticket.save()
+        return ticket
 
     def calculate_totals(self):
         total = sum(item.line_total for item in self.items.all())

@@ -159,6 +159,9 @@
       <a href="{% url 'booking:ticket_list' %}" class="btn btn-primary {% if request.path == '/booking/' %}active{% endif %}"
           >Buy Ticket<i class="fa fa-arrow-right ms-3"></i
         ></a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'booking:my_bookings' %}" class="btn btn-outline-light ms-2">My Bookings</a>
+      {% endif %}
       </div>
     </nav>
     <!-- Navbar End -->

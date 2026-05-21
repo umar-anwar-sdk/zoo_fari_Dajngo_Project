@@ -2,7 +2,17 @@
 {% block content %}
 <div class="container-xxl py-5">
   <div class="container">
-    <div class="card shadow-sm border-0">
+    <style>
+      /* Print only the ticket card */
+      @media print {
+        body * { visibility: hidden; }
+        #ticket-card, #ticket-card * { visibility: visible; }
+        #ticket-card { position: absolute; left: 0; top: 0; width: 100%; }
+        .no-print { display: none !important; }
+      }
+    </style>
+
+    <div id="ticket-card" class="card shadow-sm border-0">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
@@ -22,7 +32,17 @@
               {% elif ticket.booking.selected_package %}
                 {{ ticket.booking.selected_package.package_name }}
               {% else %}
-                {{ ticket.booking.items.first.ticket_type.name|default:ticket.booking.items.first.package.package_name }}
+                {% if ticket.booking.items.first %}
+                  {% if ticket.booking.items.first.ticket_type %}
+                    {{ ticket.booking.items.first.ticket_type.name }}
+                  {% elif ticket.booking.items.first.package %}
+                    {{ ticket.booking.items.first.package.package_name }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                {% else %}
+                  N/A
+                {% endif %}
               {% endif %}
             </p>
             <p><strong>Quantity:</strong> {{ ticket.booking.items.count }}</p>
@@ -39,11 +59,13 @@
           </div>
         </div>
         <div class="mt-4">
-          <a href="{% url 'booking:checkout' %}" class="btn btn-primary">Book Another Ticket</a>
-          <button class="btn btn-outline-secondary" onclick="window.print()">Print Ticket</button>
+          <a href="{% url 'booking:checkout' %}" class="btn btn-primary no-print">Book Another Ticket</a>
+          <button type="button" class="btn btn-outline-secondary no-print" onclick="window.print()">Print Ticket</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
+
+<!-- print handled inline via onclick to ensure immediate behavior -->

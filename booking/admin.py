@@ -31,11 +31,29 @@ class BookingItemInline(admin.TabularInline):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'phone_number', 'visit_date', 'payment_status', 'original_total', 'discount_amount', 'final_total', 'created_at')
-    list_filter = ('payment_status', 'visit_date')
+    list_display = ('full_name', 'email', 'phone_number', 'visit_date', 'payment_status', 'approval_status', 'original_total', 'discount_amount', 'final_total', 'created_at')
+    list_filter = ('payment_status', 'approval_status', 'visit_date')
     search_fields = ('full_name', 'email', 'cnic', 'phone_number', 'booking_reference')
     readonly_fields = ('created_at', 'booking_reference', 'original_total', 'discount_amount', 'final_total')
     inlines = [BookingItemInline]
+    actions = ['approve_bookings', 'reject_bookings']
+
+    def approve_bookings(self, request, queryset):
+        for booking in queryset:
+            if booking.approval_status != 'approved':
+                booking.approval_status = 'approved'
+                booking.approval_notes = 'Approved via admin action.'
+                booking.save()
+                booking.issue_ticket()
+        self.message_user(request, 'Selected bookings have been approved and tickets issued.')
+    approve_bookings.short_description = 'Approve selected bookings and issue tickets'
+
+    def reject_bookings(self, request, queryset):
+        for booking in queryset:
+            if booking.approval_status != 'rejected':
+                booking.reject(notes='Rejected via admin action.')
+        self.message_user(request, 'Selected bookings have been rejected.')
+    reject_bookings.short_description = 'Reject selected bookings'
 
 
 @admin.register(IssuedTicket)

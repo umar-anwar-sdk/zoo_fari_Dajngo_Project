@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
+from django.contrib import messages
 from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -178,12 +179,18 @@ def checkout(request):
                     package=item.package,
                     quantity=item.quantity,
                 )
+            if cart_items.count() == 1:
+                first_item = cart_items.first()
+                if first_item.ticket_type:
+                    booking.selected_ticket = first_item.ticket_type
+                    booking.selected_package = None
+                elif first_item.package:
+                    booking.selected_package = first_item.package
+                    booking.selected_ticket = None
             booking.calculate_totals()
             booking.payment_status = 'paid'
+            booking.approval_status = 'pending'
             booking.save()
-            ticket = IssuedTicket.objects.create(booking=booking)
-            ticket.qr_code.save(f'{ticket.ticket_id}.png', generate_qr_code(str(ticket.ticket_id)))
-            ticket.save()
             cart_items.delete()
             return redirect('booking:booking_confirmation', booking_id=booking.id)
     else:
@@ -200,8 +207,20 @@ def booking_confirmation(request, booking_id):
     return render(request, 'booking/booking_confirmation.html', {'booking': booking})
 
 
+def my_bookings(request):
+    if not request.user.is_authenticated:
+        messages.warning(request, 'Please login to view your bookings.')
+        return redirect('site_login')
+
+    bookings = Booking.objects.filter(user=request.user).order_by('-visit_date')
+    return render(request, 'booking/my_bookings.html', {'bookings': bookings})
+
+
 def ticket_download(request, ticket_id):
     ticket = get_object_or_404(IssuedTicket, ticket_id=ticket_id)
+    if ticket.booking.user != request.user and request.user.role not in ['admin', 'staff']:
+        messages.warning(request, 'You do not have permission to view this ticket.')
+        return redirect('home')
     return render(request, 'booking/ticket_download.html', {'ticket': ticket})
 
 
@@ -255,13 +274,16 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['payment_status', 'visit_date', 'offer']
+    filterset_fields = ['approval_status', 'payment_status', 'visit_date', 'offer']
     search_fields = ['full_name', 'email', 'cnic']
 
     def get_queryset(self):
-        if self.request.user.is_authenticated and self.request.user.role not in ['admin', 'staff']:
-            return Booking.objects.filter(user=self.request.user)
-        return Booking.objects.all()
+        user = self.request.user
+        if user.is_authenticated:
+            if user.role in ['admin', 'staff']:
+                return Booking.objects.all()
+            return Booking.objects.filter(user=user)
+        return Booking.objects.none()
 
     def get_permissions(self):
         if self.action in ['create', 'calculate']:
@@ -292,18 +314,44 @@ class BookingViewSet(viewsets.ModelViewSet):
             'best_offer': OfferSerializer(summary['best_offer']).data if summary['best_offer'] else None,
         })
 
+    @action(detail=True, methods=['post'], permission_classes=[IsStaffOrAdminUser])
+    def approve(self, request, pk=None):
+        booking = self.get_object()
+        booking.approval_status = 'approved'
+        booking.approval_notes = request.data.get('approval_notes', '')
+        booking.save()
+        booking.issue_ticket()
+        serializer = self.get_serializer(booking)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsStaffOrAdminUser])
+    def reject(self, request, pk=None):
+        booking = self.get_object()
+        booking.reject(notes=request.data.get('approval_notes', 'Rejected by staff/admin'))
+        serializer = self.get_serializer(booking)
+        return Response(serializer.data)
+
 
 class IssuedTicketViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = IssuedTicket.objects.all()
     serializer_class = IssuedTicketSerializer
-    permission_classes = [IsStaffOrAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['status']
     search_fields = ['ticket_id', 'booking__full_name']
 
-    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.role not in ['admin', 'staff']:
+            return IssuedTicket.objects.filter(booking__user=user)
+        return IssuedTicket.objects.all()
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def download_pdf(self, request, pk=None):
         ticket = self.get_object()
+        if request.user.role not in ['admin', 'staff'] and ticket.booking.user != request.user:
+            return Response({'detail': 'Not authorized to download this ticket.'}, status=403)
+
         pdf_data = generate_ticket_pdf(ticket)
         response = HttpResponse(pdf_data, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.ticket_id}.pdf"'

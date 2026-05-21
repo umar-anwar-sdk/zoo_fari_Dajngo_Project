@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col">
+        <h1 class="display-6">My Bookings</h1>
+        <p class="text-muted">Review your booking requests, approval status, and access tickets after approval.</p>
+      </div>
+    </div>
+
+    {% if bookings %}
+      <div class="row g-4">
+        {% for booking in bookings %}
+          <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h5 class="card-title">{{ booking.booking_reference }}</h5>
+                <p class="mb-1"><strong>Name:</strong> {{ booking.full_name }}</p>
+                <p class="mb-1"><strong>Visit Date:</strong> {{ booking.visit_date }}</p>
+                <p class="mb-1"><strong>Members:</strong> {{ booking.number_of_members }}</p>
+                <p class="mb-1"><strong>Offer:</strong>
+                  {% if booking.offer %}
+                    {{ booking.offer.title }}
+                  {% else %}
+                    No offer applied
+                  {% endif %}
+                </p>
+                <p class="mb-1"><strong>Total Paid:</strong> PKR {{ booking.final_total }}</p>
+                <p class="mb-1"><strong>Payment:</strong> {{ booking.payment_status|capfirst }}</p>
+                <p class="mb-1"><strong>Approval:</strong>
+                  {% if booking.approval_status == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                  {% elif booking.approval_status == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% endif %}
+                </p>
+                {% if booking.issued_ticket %}
+                  <a href="{% url 'booking:ticket_download' booking.issued_ticket.ticket_id %}" class="btn btn-primary btn-sm mt-3">Download Ticket</a>
+                {% elif booking.approval_status == 'pending' %}
+                  <p class="text-muted mt-3">Waiting for approval before ticket is generated.</p>
+                {% elif booking.approval_status == 'rejected' %}
+                  <p class="text-danger mt-3">This booking was rejected. Contact support for details.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        <p>You have no bookings yet. <a href="{% url 'booking:ticket_list' %}">Browse tickets</a> to make a booking.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

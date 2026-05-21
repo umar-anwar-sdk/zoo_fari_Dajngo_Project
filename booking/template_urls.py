@@ -11,5 +11,6 @@ urlpatterns = [
     path('cart/item/<int:item_id>/remove/', views.remove_cart_item, name='remove_cart_item'),
     path('checkout/', views.checkout, name='checkout'),
     path('confirmation/<int:booking_id>/', views.booking_confirmation, name='booking_confirmation'),
+    path('my-bookings/', views.my_bookings, name='my_bookings'),
     path('ticket/<uuid:ticket_id>/download/', views.ticket_download, name='ticket_download'),
 ]
