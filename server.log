@@ -970,3 +970,11 @@ Starting development server at http://127.0.0.1:8080/
 Quit the server with CONTROL-C.
 
 Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 21, 2026 - 06:19:34
+Django version 5.0.4, using settings 'zoofari.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+

@@ -40,22 +40,6 @@ class Call(models.Model):
         return self.number
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class OurAnimals(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
-    image = models.ImageField(upload_to='animals/')
-
-    def __int__(self):
-        return self.name
-
-
 class Offers(models.Model):
     number = models.IntegerField()
     image = models.ImageField(upload_to='animals/')

@@ -4,18 +4,18 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.core.mail import send_mail
 from .form import MyForm, CustomLoginForm
-from home.models import Topslider, Welcometext, Welcomelist, Services, Call, OurAnimals, Offers, Contact, Customer, \
-    MembershipCardOrder, MembershipOrder, Address, Email, UserCreateFrom
+from home.models import Topslider, Welcometext, Welcomelist, Services, Call, Offers, Contact, Customer, MembershipCardOrder, MembershipOrder, Address, Email, UserCreateFrom
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
+from core.models import Animal, Category
+from core.serializers import AnimalSerializer, CategorySerializer
 
 User = get_user_model()
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Category
-from .serializers import (CallSerializer, CategorySerializer, CustomerSerializer, MembershipCardSerializer, MembershipSerializer, OurAnimalsSerializer, ServicesSerializer, SliderSerializer, UserRegistrationSerializer, 
-                          WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer, 
+from .serializers import (CallSerializer, CustomerSerializer, MembershipCardSerializer, MembershipSerializer, ServicesSerializer, SliderSerializer, UserRegistrationSerializer,
+                          WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer,
                           ContactSerializer, AddressSerializer, EmailSerializer)
 
 
@@ -28,7 +28,11 @@ def home(request):
     service = Services.objects.all()
     call = Call.objects.first()
     address = Address.objects.first()
-    animal = OurAnimals.objects.all()
+    categories = Category.objects.all()
+    selected_category_id = request.GET.get('category')
+    animals = Animal.objects.filter(status='active')
+    if selected_category_id:
+        animals = animals.filter(category_id=selected_category_id)
     offers = Offers.objects.all()
     email = Email.objects.first()
     context = {
@@ -37,7 +41,9 @@ def home(request):
         'wlist': wlist,
         'service': service,
         'call': call,
-        'animal': animal,
+        'animals': animals,
+        'categories': categories,
+        'selected_category_id': int(selected_category_id) if selected_category_id else None,
         'offers': offers,
         'address': address,
         'email': email,
@@ -73,9 +79,15 @@ def services(request):
 
 
 def animals(request):
-    animal = OurAnimals.objects.all()
+    categories = Category.objects.all()
+    selected_category_id = request.GET.get('category')
+    animals = Animal.objects.filter(status='active')
+    if selected_category_id:
+        animals = animals.filter(category_id=selected_category_id)
     context = {
-        'animal': animal,
+        'animals': animals,
+        'categories': categories,
+        'selected_category_id': int(selected_category_id) if selected_category_id else None,
     }
     return render(request, 'animal.html', context)
 
@@ -319,22 +331,17 @@ def get_call_api(request):
 
 @api_view(['GET'])
 def get_category_api(request):
-    data = {
-        "category": Category.objects.all(),
-    }
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
     return Response({
         "status": "Success",
-        "category": CategorySerializer(data["category"], many=True).data,
-        })
-
+        "categories": serializer.data,
+    })
 
 @api_view(['GET'])
 def get_ouranimals_api(request):
-    animals_queryset = OurAnimals.objects.all()
-    
-  
-    serializer = OurAnimalsSerializer(animals_queryset, many=True)
-    
+    animals_queryset = Animal.objects.all()
+    serializer = AnimalSerializer(animals_queryset, many=True)
     return Response({
         "status": "Success",
         "animals": serializer.data,
@@ -497,7 +504,7 @@ def create_category_api(request):
 
 @api_view(['POST'])
 def create_ouranimals_api(request):
-    serializer = OurAnimalsSerializer(data=request.data)
+    serializer = AnimalSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response({"status": "Success", "message": "Animal created successfully."})
@@ -679,14 +686,14 @@ def update_category_api(request, pk):
     return Response(serializer.errors, status=400)
 
 
-@api_view(['PATCH']) 
+@api_view(['PATCH'])
 def update_ouranimals_api(request, pk):
     try:
-        animal = OurAnimals.objects.get(pk=pk)
-    except OurAnimals.DoesNotExist:
+        animal = Animal.objects.get(pk=pk)
+    except Animal.DoesNotExist:
         return Response({"message": "Not found!"}, status=404)
 
-    serializer = OurAnimalsSerializer(animal, data=request.data, partial=True)
+    serializer = AnimalSerializer(animal, data=request.data, partial=True)
     
     if serializer.is_valid():
         serializer.save()
@@ -885,10 +892,10 @@ def delete_category_api(request, pk):
 @api_view(['DELETE'])
 def delete_ouranimals_api(request, pk):
     try:
-        animal = OurAnimals.objects.get(pk=pk)
+        animal = Animal.objects.get(pk=pk)
         animal.delete()
         return Response({"message": "Animal deleted successfully!"}, status=200)
-    except OurAnimals.DoesNotExist:
+    except Animal.DoesNotExist:
         return Response({"message": "It was already not there."}, status=404)
 
 

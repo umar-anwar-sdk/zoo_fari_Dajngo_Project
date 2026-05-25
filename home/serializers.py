@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from home.models import Call, Category, MembershipCardOrder, User,Address, Contact, Customer, Email, MembershipOrder, Offers, Services, OurAnimals, Topslider, Welcometext, Welcomelist
+from home.models import Call, MembershipCardOrder, User, Address, Contact, Customer, Email, MembershipOrder, Offers, Services, Topslider, Welcometext, Welcomelist
 
 class SliderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,18 +25,6 @@ class ServicesSerializer(serializers.ModelSerializer):
 class CallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Call
-        fields = '__all__'
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'        
-
-
-class OurAnimalsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OurAnimals
         fields = '__all__'
 
 

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from home.models import Topslider, Welcomelist, Welcometext, Services, Call, OurAnimals, Category, Offers, Contact, \
-    Customer, Address, Email
+from home.models import Topslider, Welcomelist, Welcometext, Services, Call, Offers, Contact, Customer, Address, Email
 
 
 # Register your models here.
@@ -40,20 +39,6 @@ class CallAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Call)
-
-
-class OurAnimalsAdmin(admin.ModelAdmin):
-    list_display = ['name', 'image']
-
-
-admin.site.register(OurAnimals)
-
-
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name']
-
-
-admin.site.register(Category)
 
 
 class OffersAdmin(admin.ModelAdmin):

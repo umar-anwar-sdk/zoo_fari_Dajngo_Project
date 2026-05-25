@@ -18,6 +18,7 @@ class AnimalViewSet(viewsets.ModelViewSet):
     queryset = Animal.objects.all()
     serializer_class = AnimalSerializer
     permission_classes = (IsStaffAdminOrReadOnly,)
+    pagination_class = None
 
 class FamilyPackageViewSet(viewsets.ModelViewSet):
     queryset = FamilyPackage.objects.all()

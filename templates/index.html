@@ -215,19 +215,18 @@
           </div>
         </div>
         <div class="row g-4">
-            {% for o in animal %}
+            {% for o in animals %}
           <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
             <div class="row g-4">
               <div class="col-12">
                 <a
                   class="animal-item"
-                  href="{{o.image.url}}"
-                  data-lightbox="animal"
+                  {% if o.image %}href="{{ o.image.url }}" data-lightbox="animal"{% endif %}
                 >
                   <div class="position-relative">
-                    <img class="img-fluid" src="{{o.image.url}}" alt="" />
+                    <img class="img-fluid" src="{% if o.image %}{{ o.image.url }}{% else %}{% static 'img/icon/icon-10.png' %}{% endif %}" alt="{{ o.name }}" />
                     <div class="animal-text p-4">
-                      <p class="text-white small text-uppercase mb-0">{{ o.category }}</p>
+                      <p class="text-white small text-uppercase mb-0">{% if o.category %}{{ o.category.name }}{% else %}Uncategorized{% endif %}</p>
                       <h5 class="text-white mb-0">{{ o.name }}</h5>
                     </div>
                   </div>
