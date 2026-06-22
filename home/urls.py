@@ -106,4 +106,31 @@ urlpatterns = [
         ]
 
 
+# New DRF routers for home resources (keeps existing function endpoints intact)
+from rest_framework.routers import DefaultRouter
+from .views import (
+    SliderViewSet, WelcomeTextViewSet, WelcomeListViewSet, ServicesViewSet, CallViewSet,
+    OffersViewSet, MembershipOrderViewSet, ContactViewSet, CustomerViewSet,
+    MembershipCardViewSet, AddressViewSet, EmailViewSet
+)
+
+router = DefaultRouter()
+router.register(r'sliders', SliderViewSet, basename='slider')
+router.register(r'welcome-texts', WelcomeTextViewSet, basename='welcome-text')
+router.register(r'welcome-lists', WelcomeListViewSet, basename='welcome-list')
+router.register(r'services', ServicesViewSet, basename='services')
+router.register(r'calls', CallViewSet, basename='call')
+router.register(r'home-offers', OffersViewSet, basename='home-offers')
+router.register(r'membership-orders', MembershipOrderViewSet, basename='membership-order')
+router.register(r'contacts', ContactViewSet, basename='contact')
+router.register(r'customers', CustomerViewSet, basename='customer')
+router.register(r'membership-cards', MembershipCardViewSet, basename='membership-card')
+router.register(r'addresses', AddressViewSet, basename='address')
+router.register(r'emails', EmailViewSet, basename='email')
+
+urlpatterns += [
+    path('api/v2/', include(router.urls)),
+]
+
+
 

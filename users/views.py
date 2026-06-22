@@ -46,6 +46,28 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(role=role)
         return self.queryset
 
+    @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
+    def bulk_staff_approval(self, request):
+        """Bulk approve/reject staff users. Expects: {"ids": [1,2], "action": "approve"|"reject"}"""
+        ids = request.data.get('ids', [])
+        action = request.data.get('action')
+        if not isinstance(ids, (list, tuple)):
+            return Response({'detail': 'ids must be a list of user IDs.'}, status=400)
+        if action not in ['approve', 'reject']:
+            return Response({'detail': "action must be 'approve' or 'reject'"}, status=400)
+        users = User.objects.filter(pk__in=ids, role='staff')
+        for u in users:
+            if action == 'approve':
+                u.is_approved_staff = True
+                u.is_active = True
+                u.is_staff = True
+            else:
+                u.is_approved_staff = False
+                u.is_active = False
+            u.save()
+        serializer = self.get_serializer(users, many=True)
+        return Response(serializer.data)
+
 class StaffApprovalView(views.APIView):
     permission_classes = (IsAdminUser,)
 

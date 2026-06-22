@@ -17,6 +17,89 @@ from rest_framework.response import Response
 from .serializers import (CallSerializer, CustomerSerializer, MembershipCardSerializer, MembershipSerializer, ServicesSerializer, SliderSerializer, UserRegistrationSerializer,
                           WelcomeTextSerializer, WelcomeListSerializer, OffersSerializer,
                           ContactSerializer, AddressSerializer, EmailSerializer)
+from rest_framework import viewsets, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from users.permissions import IsStaffOrAdminUser, IsAdminUser
+
+
+# DRF ViewSets for admin-managed models (keeps existing function-based APIs intact)
+
+
+class BaseAdminViewSet(viewsets.ModelViewSet):
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [IsStaffOrAdminUser()]
+
+
+class SliderViewSet(BaseAdminViewSet):
+    queryset = Topslider.objects.all()
+    serializer_class = SliderSerializer
+    search_fields = ['image']
+    ordering = ['-id']
+
+
+class WelcomeTextViewSet(BaseAdminViewSet):
+    queryset = Welcometext.objects.all()
+    serializer_class = WelcomeTextSerializer
+    search_fields = ['title']
+
+
+class WelcomeListViewSet(BaseAdminViewSet):
+    queryset = Welcomelist.objects.all()
+    serializer_class = WelcomeListSerializer
+    search_fields = ['list']
+
+
+class ServicesViewSet(BaseAdminViewSet):
+    queryset = Services.objects.all()
+    serializer_class = ServicesSerializer
+    search_fields = ['title', 'text']
+
+
+class CallViewSet(BaseAdminViewSet):
+    queryset = Call.objects.all()
+    serializer_class = CallSerializer
+
+
+class OffersViewSet(BaseAdminViewSet):
+    queryset = Offers.objects.all()
+    serializer_class = OffersSerializer
+    search_fields = ['name']
+
+
+class MembershipOrderViewSet(BaseAdminViewSet):
+    queryset = MembershipOrder.objects.all()
+    serializer_class = MembershipSerializer
+
+
+class ContactViewSet(BaseAdminViewSet):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+    search_fields = ['name', 'email', 'subject']
+
+
+class CustomerViewSet(BaseAdminViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    search_fields = ['email', 'first', 'last']
+
+
+class MembershipCardViewSet(BaseAdminViewSet):
+    queryset = MembershipCardOrder.objects.all()
+    serializer_class = MembershipCardSerializer
+
+
+class AddressViewSet(BaseAdminViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
+
+class EmailViewSet(BaseAdminViewSet):
+    queryset = Email.objects.all()
+    serializer_class = EmailSerializer
 
 
 

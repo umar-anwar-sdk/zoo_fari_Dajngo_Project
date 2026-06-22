@@ -9,4 +9,5 @@ router.register(r'packages', FamilyPackageViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('admin-stats/', admin_stats),
 ]

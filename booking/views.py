@@ -324,6 +324,36 @@ class BookingViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(booking)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['post'], permission_classes=[IsStaffOrAdminUser])
+    def bulk_approve(self, request):
+        """Bulk approve bookings and issue tickets. Expects JSON: {"ids": [1,2,3]}"""
+        ids = request.data.get('ids', [])
+        if not isinstance(ids, (list, tuple)):
+            return Response({'detail': 'ids must be a list of booking IDs.'}, status=400)
+        bookings = Booking.objects.filter(pk__in=ids)
+        for booking in bookings:
+            if booking.approval_status != 'approved':
+                booking.approval_status = 'approved'
+                booking.approval_notes = 'Approved via bulk API action.'
+                booking.save()
+                booking.issue_ticket()
+        serializer = self.get_serializer(bookings, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsStaffOrAdminUser])
+    def bulk_reject(self, request):
+        """Bulk reject bookings. Expects JSON: {"ids": [1,2], "notes": "reason"}"""
+        ids = request.data.get('ids', [])
+        notes = request.data.get('notes', 'Rejected via bulk API action.')
+        if not isinstance(ids, (list, tuple)):
+            return Response({'detail': 'ids must be a list of booking IDs.'}, status=400)
+        bookings = Booking.objects.filter(pk__in=ids)
+        for booking in bookings:
+            if booking.approval_status != 'rejected':
+                booking.reject(notes=notes)
+        serializer = self.get_serializer(bookings, many=True)
+        return Response(serializer.data)
+
     @action(detail=True, methods=['post'], permission_classes=[IsStaffOrAdminUser])
     def reject(self, request, pk=None):
         booking = self.get_object()
